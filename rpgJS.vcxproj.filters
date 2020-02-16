@@ -1,0 +1,128 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Fichiers de ressources">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="gameplay">
+      <UniqueIdentifier>{647127ff-f1ab-4581-bf7e-5d3ae7bef97d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="gameplay\Inventaire">
+      <UniqueIdentifier>{c9d60544-64f0-48b6-a609-00d8559be5c2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="TJS">
+      <UniqueIdentifier>{0d6ed2cc-ae33-4e05-91b2-6e4a7d9757e6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="gameplay\Carte">
+      <UniqueIdentifier>{31f59446-fa01-4d99-a024-ff0d073da622}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="TJS\TinyJS_MathFunctions.h">
+      <Filter>TJS</Filter>
+    </ClInclude>
+    <ClInclude Include="TJS\TinyJS.h">
+      <Filter>TJS</Filter>
+    </ClInclude>
+    <ClInclude Include="TJS\TinyJS_Functions.h">
+      <Filter>TJS</Filter>
+    </ClInclude>
+    <ClInclude Include="targetver.h" />
+    <ClInclude Include="stdafx.h" />
+    <ClInclude Include="gameplay\Carte.h">
+      <Filter>gameplay</Filter>
+    </ClInclude>
+    <ClInclude Include="gameplay\Inventaire\InventoryObj.h">
+      <Filter>gameplay\Inventaire</Filter>
+    </ClInclude>
+    <ClInclude Include="gameplay\Inventaire\InventoryViewObj.h">
+      <Filter>gameplay\Inventaire</Filter>
+    </ClInclude>
+    <ClInclude Include="gameplay\Inventaire\Item.h">
+      <Filter>gameplay\Inventaire</Filter>
+    </ClInclude>
+    <ClInclude Include="gameplay\Inventory.h">
+      <Filter>gameplay</Filter>
+    </ClInclude>
+    <ClInclude Include="gameplay\Carte\Chest.h">
+      <Filter>gameplay\Carte</Filter>
+    </ClInclude>
+    <ClInclude Include="gameplay\Carte\Monster.h">
+      <Filter>gameplay\Carte</Filter>
+    </ClInclude>
+    <ClInclude Include="gameplay\Carte\PNJ.h">
+      <Filter>gameplay\Carte</Filter>
+    </ClInclude>
+    <ClInclude Include="gameplay\Carte\Props.h">
+      <Filter>gameplay\Carte</Filter>
+    </ClInclude>
+    <ClInclude Include="gameplay\Carte\Trigger.h">
+      <Filter>gameplay\Carte</Filter>
+    </ClInclude>
+    <ClInclude Include="Gameplay.h" />
+    <ClInclude Include="TIJS.h" />
+    <ClInclude Include="gameplay\gameStoryData.h">
+      <Filter>gameplay</Filter>
+    </ClInclude>
+    <ClInclude Include="gameplay\Player.h">
+      <Filter>gameplay</Filter>
+    </ClInclude>
+    <ClInclude Include="gameplay\Animator.h">
+      <Filter>gameplay</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="TJS\TinyJS.cpp">
+      <Filter>TJS</Filter>
+    </ClCompile>
+    <ClCompile Include="TJS\TinyJS_Functions.cpp">
+      <Filter>TJS</Filter>
+    </ClCompile>
+    <ClCompile Include="TJS\TinyJS_MathFunctions.cpp">
+      <Filter>TJS</Filter>
+    </ClCompile>
+    <ClCompile Include="stdafx.cpp" />
+    <ClCompile Include="rpgJS.cpp" />
+    <ClCompile Include="gameplay\Carte.cpp">
+      <Filter>gameplay</Filter>
+    </ClCompile>
+    <ClCompile Include="gameplay\Inventaire\InventoryObj.cpp">
+      <Filter>gameplay\Inventaire</Filter>
+    </ClCompile>
+    <ClCompile Include="gameplay\Inventaire\InventoryViewObj.cpp">
+      <Filter>gameplay\Inventaire</Filter>
+    </ClCompile>
+    <ClCompile Include="gameplay\Inventaire\Item.cpp">
+      <Filter>gameplay\Inventaire</Filter>
+    </ClCompile>
+    <ClCompile Include="gameplay\Inventory.cpp">
+      <Filter>gameplay</Filter>
+    </ClCompile>
+    <ClCompile Include="gameplay\Carte\Chest.cpp">
+      <Filter>gameplay\Carte</Filter>
+    </ClCompile>
+    <ClCompile Include="gameplay\Carte\Monster.cpp">
+      <Filter>gameplay\Carte</Filter>
+    </ClCompile>
+    <ClCompile Include="gameplay\Carte\PNJ.cpp">
+      <Filter>gameplay\Carte</Filter>
+    </ClCompile>
+    <ClCompile Include="gameplay\Carte\Props.cpp">
+      <Filter>gameplay\Carte</Filter>
+    </ClCompile>
+    <ClCompile Include="gameplay\Carte\Trigger.cpp">
+      <Filter>gameplay\Carte</Filter>
+    </ClCompile>
+    <ClCompile Include="TIJS.cpp" />
+    <ClCompile Include="gameplay\gameStoryData.cpp">
+      <Filter>gameplay</Filter>
+    </ClCompile>
+    <ClCompile Include="gameplay\Player.cpp">
+      <Filter>gameplay</Filter>
+    </ClCompile>
+    <ClCompile Include="gameplay\Animator.cpp">
+      <Filter>gameplay</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>
