@@ -149,6 +149,7 @@ int main(int argc, char *argv[])
 							TheView.setCenter(TheSTMap->getSpawnPosX(), TheSTMap->getSpawnPosY());
 
 							ActualPhase = Phase::InGame;
+							AnimationClock.restart();
 						}
 					}
 					break;
@@ -179,6 +180,7 @@ int main(int argc, char *argv[])
 							TheView.setCenter(TheSTMap->getSpawnPosX(), TheSTMap->getSpawnPosY());
 
 							ActualPhase = Phase::InGame;
+							AnimationClock.restart();
 						}
 					}
 					break;
@@ -199,8 +201,7 @@ int main(int argc, char *argv[])
 			RightLeftDepl = 1;
 			if (notRightBefore) {
 				Animator* TheAnim = TheStoryData.getPlayer()->getAnimation("WalkRight");
-				if (TheAnim != nullptr) { TheAnim->reset(); }
-				AnimationClock.restart();
+				if (TheAnim != nullptr) { TheAnim->reset(AnimationClock.getElapsedTime()); }
 				notRightBefore = false;
 			}
 			notRightActivate = false;
@@ -210,8 +211,7 @@ int main(int argc, char *argv[])
 			RightLeftDepl = -1;
 			if (notLeftBefore) {
 				Animator* TheAnim = TheStoryData.getPlayer()->getAnimation("WalkLeft");
-				if (TheAnim != nullptr) { TheAnim->reset(); }
-				AnimationClock.restart();
+				if (TheAnim != nullptr) { TheAnim->reset(AnimationClock.getElapsedTime()); }
 				notLeftBefore = false;
 			}
 			notLeftActivate = false;
@@ -221,8 +221,7 @@ int main(int argc, char *argv[])
 			UpDownDepl = -1;
 			if (notUpBefore) {
 				Animator* TheAnim = TheStoryData.getPlayer()->getAnimation("WalkUp");
-				if (TheAnim != nullptr) { TheAnim->reset(); }
-				AnimationClock.restart(); 
+				if (TheAnim != nullptr) { TheAnim->reset(AnimationClock.getElapsedTime()); }
 				notUpBefore = false;
 			}
 			notUpActivate = false;
@@ -232,8 +231,7 @@ int main(int argc, char *argv[])
 			UpDownDepl = 1;
 			if (notDownBefore) {
 				Animator* TheAnim = TheStoryData.getPlayer()->getAnimation("WalkDown");
-				if (TheAnim != nullptr) { TheAnim->reset(); }
-				AnimationClock.restart();
+				if (TheAnim != nullptr) { TheAnim->reset(AnimationClock.getElapsedTime()); }
 				notDownBefore = false;
 			}
 			notDownActivate = false;
