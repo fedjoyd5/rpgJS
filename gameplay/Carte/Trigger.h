@@ -1,15 +1,18 @@
 #pragma once
 
 #include <string>
+#include <map>
+#include <SFML\Graphics.hpp>
+
 #include "../../TIJS.h"
 #include "../Animator.h"
 
-class Trigger
+class Trigger : public sf::Sprite
 {
 public:
 	Trigger();
-	Trigger(std::string newID, std::string newPath, unsigned int newPosX, unsigned int newPosY);
-	Trigger(std::string newID, unsigned int newPosX, unsigned int newPosY, unsigned int newWidth, unsigned int newHeight, std::string newSimpleTpMap, std::string newSimpleTpArrID);
+	Trigger(std::string newID, std::string newPath, float newPosX, float newPosY);
+	Trigger(std::string newID, float newPosX, float newPosY, unsigned int newWidth, unsigned int newHeight, std::string newSimpleTpMap, std::string newSimpleTpArrID);
 	~Trigger();
 
 	void initialize();
@@ -18,35 +21,40 @@ public:
 	bool isSimpleTP();
 	std::string getSimpleTPMap();
 	std::string getSimpleTPArrID();
-	std::string getTexturePath();
-
 	unsigned int getWidth();
 	unsigned int getHeight();
-	unsigned int getPosXTexture(std::string theID);
-	unsigned int getPosYTexture(std::string theID);
-	unsigned int getDefaultXTexture();
-	unsigned int getDefaultYTexture();
+
+	std::string getTexturePath();
+	sf::IntRect getTextureIntRect(std::string theIntRectID);
+	sf::IntRect getDefaultTextureIntRect();
+	Animator* getAnimation(std::string theAnimationID);
+	sf::IntRect getAnimationZeroIntRect(std::string theAnimationID);
+	void resetAnimation(std::string theAnimationID, sf::Time newElapsedTime);
 private:
 	std::string ID;
 	std::string Path;
-	unsigned int PosX;
-	unsigned int PosY;
-	unsigned int Width;
-	unsigned int Height;
+	sf::IntRect Activateur;
 
 	std::string textureID;
 	unsigned int width;
 	unsigned int height;
-	std::map<std::string, unsigned int> posTexture;
+	std::map<std::string, sf::IntRect> mapTextureIntRect;
+	std::map<std::string, Animator> mapAnimator;
 
 	bool simpleTp;
 	std::string simpleTpMap;
 	std::string simpleTpArrID;
 
 public:
-	void setWidth(unsigned int newWidth);
-	void setHeight(unsigned int newHeight);
+	void setTextureID(std::string newID);
+	void setSize(unsigned int newWidth, unsigned int newHeight);
+	bool addPosTexture(std::string newID, unsigned int newPosX, unsigned int newPosY);
+	bool addTextureIntRect(std::string newID, unsigned int newPosX, unsigned int newPosY, unsigned int newWidth, unsigned int newHeight);
+	bool addAnimation(std::string newAnimationID, unsigned int newNbImage, float newDurationBImg);
 };
 
-void trigger_js_setWidth(CScriptVar * v, void * userdata);
-void trigger_js_setHeight(CScriptVar * v, void * userdata);
+void trigger_js_setTexture(CScriptVar *v, void *userdata);
+void trigger_js_setSize(CScriptVar *v, void *userdata);
+void trigger_js_addPosTexture(CScriptVar *v, void *userdata);
+void trigger_js_addTextureIntRect(CScriptVar *v, void *userdata);
+void trigger_js_addAnimation(CScriptVar *v, void *userdata);

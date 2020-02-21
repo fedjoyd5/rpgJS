@@ -10,6 +10,11 @@
 #include "TJS\TinyJS_Functions.h"
 #include "TJS\TinyJS_MathFunctions.h"
 
+int doAPourcent(double Pourcent, int Maximum);
+int doAPourcentWithCenter(double Pourcent, int Maximum, int objTaille);
+int doAMap(int Cur, int MaxDep, int MaxArr);
+int doAMap(int Cur, int MinDep, int MaxDep, int MinArr, int MaxArr);
+
 CTinyJS* getNewJSContext();
 
 void js_print(CScriptVar *v, void *userdata);

@@ -21,29 +21,34 @@ public:
 
 	std::string getID();
 	std::string getName();
-	unsigned int getSpawnPosX();
-	unsigned int getSpawnPosY();
+	float getSpawnPosX();
+	float getSpawnPosY();
 
 	std::string getBackgroundPath();
 	std::string getWalkAbleGridPath();
 	std::string getForegroundPath();
 
 	Chest* getChest(std::string theID);
+	std::vector<std::string> getChestIdList();
 	Monster* getMonster(std::string theID);
+	std::vector<std::string> getMonsterIdList();
 	PNJ* getPNJ(std::string theID);
+	std::vector<std::string> getPNJIdList();
 	Props* getProps(std::string theID);
+	std::vector<std::string> getPropsIdList();
 	Trigger* getTrigger(std::string theID);
+	std::vector<std::string> getTriggerIdList();
 
-	unsigned int getTpArrivalPosX(std::string theID);
-	unsigned int getTpArrivalPosY(std::string theID);
+	float getTpArrivalPosX(std::string theID);
+	float getTpArrivalPosY(std::string theID);
 
 	void initialize();
 private:
 	std::string ID;
 	std::string Path;
 	std::string Name;
-	unsigned int spawnPosX;
-	unsigned int spawnPosY;
+	float spawnPosX;
+	float spawnPosY;
 	std::string BackgroundID;
 	std::string WalkAbleGridID;
 	std::string ForegroundID;
@@ -54,22 +59,22 @@ private:
 	std::map<std::string, Props> propsMap;
 	std::map<std::string, Trigger> triggerMap;
 
-	std::map<std::string, unsigned int> TPArrMap;
+	std::map<std::string, float> TPArrMap;
 public:
 	void setName(std::string newName);
-	void setSpawnPoint(unsigned int newPosX, unsigned int newPosY);
+	void setSpawnPoint(float newPosX, float newPosY);
 
 	void setBackground(std::string newID);
 	void setWalkAbleGrid(std::string newID);
 	void setForeground(std::string newID);
 
-	bool addPNJ(std::string newID, unsigned int newPosX, unsigned int newPosY);
-	bool addMonster(std::string newID, unsigned int newPosX, unsigned int newPosY);
-	bool addChest(std::string newID, unsigned int newPosX, unsigned int newPosY);
-	bool addProps(std::string newID, unsigned int newPosX, unsigned int newPosY);
-	bool addTrigger(std::string newID, unsigned int newPosX, unsigned int newPosY);
-	bool addTriggerShort(std::string newID, unsigned int newPosX, unsigned int newPosY, unsigned int newWidth, unsigned int newHeight, std::string newSTPMap, std::string newSTPArrID);
-	bool addTPArrival(std::string newID, unsigned int newPosX, unsigned int newPosY);
+	bool addPNJ(std::string newID, float newPosX, float newPosY);
+	bool addMonster(std::string newID, float newPosX, float newPosY);
+	bool addChest(std::string newID, float newPosX, float newPosY);
+	bool addProps(std::string newID, float newPosX, float newPosY);
+	bool addTrigger(std::string newID, float newPosX, float newPosY);
+	bool addTriggerShort(std::string newID, float newPosX, float newPosY, unsigned int newWidth, unsigned int newHeight, std::string newSTPMap, std::string newSTPArrID);
+	bool addTPArrival(std::string newID, float newPosX, float newPosY);
 };
 
 void carte_js_setName(CScriptVar *v, void *userdata);

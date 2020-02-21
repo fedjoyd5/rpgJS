@@ -42,12 +42,12 @@ string Carte::getName()
 	return Name;
 }
 
-unsigned int Carte::getSpawnPosX()
+float Carte::getSpawnPosX()
 {
 	return spawnPosX;
 }
 
-unsigned int Carte::getSpawnPosY()
+float Carte::getSpawnPosY()
 {
 	return spawnPosY;
 }
@@ -73,10 +73,24 @@ Chest* Carte::getChest(string theID)
 	return &chestMap[theID];
 }
 
+vector<string> Carte::getChestIdList()
+{
+	vector<string> toRet(0);
+	for (map<string, Chest>::iterator chestITE = chestMap.begin(); chestITE != chestMap.end(); chestITE++) { toRet.push_back(chestITE->first); }
+	return toRet;
+}
+
 Monster* Carte::getMonster(string theID)
 {
 	if (monsterMap.count(theID) == 0) { return nullptr; }
 	return &monsterMap[theID];
+}
+
+std::vector<std::string> Carte::getMonsterIdList()
+{
+	vector<string> toRet(0);
+	for (map<string, Monster>::iterator monsterITE = monsterMap.begin(); monsterITE != monsterMap.end(); monsterITE++) { toRet.push_back(monsterITE->first); }
+	return toRet;
 }
 
 PNJ* Carte::getPNJ(string theID)
@@ -85,10 +99,24 @@ PNJ* Carte::getPNJ(string theID)
 	return &PNJMap[theID];
 }
 
+std::vector<std::string> Carte::getPNJIdList()
+{
+	vector<string> toRet(0);
+	for (map<string, PNJ>::iterator PNJITE = PNJMap.begin(); PNJITE != PNJMap.end(); PNJITE++) { toRet.push_back(PNJITE->first); }
+	return toRet;
+}
+
 Props* Carte::getProps(string theID)
 {
 	if (propsMap.count(theID) == 0) { return nullptr; }
 	return &propsMap[theID];
+}
+
+std::vector<std::string> Carte::getPropsIdList()
+{
+	vector<string> toRet(0);
+	for (map<string, Props>::iterator propsITE = propsMap.begin(); propsITE != propsMap.end(); propsITE++) { toRet.push_back(propsITE->first); }
+	return toRet;
 }
 
 Trigger* Carte::getTrigger(string theID)
@@ -97,14 +125,21 @@ Trigger* Carte::getTrigger(string theID)
 	return &triggerMap[theID];
 }
 
-unsigned int Carte::getTpArrivalPosX(string theID)
+std::vector<std::string> Carte::getTriggerIdList()
+{
+	vector<string> toRet(0);
+	for (map<string, Trigger>::iterator triggerITE = triggerMap.begin(); triggerITE != triggerMap.end(); triggerITE++) { toRet.push_back(triggerITE->first); }
+	return toRet;
+}
+
+float Carte::getTpArrivalPosX(string theID)
 {
 	string inMapID = (theID + "-PosX");
 	if (triggerMap.count(theID) == 0) { return spawnPosX; }
 	return TPArrMap[inMapID];
 }
 
-unsigned int Carte::getTpArrivalPosY(string theID)
+float Carte::getTpArrivalPosY(string theID)
 {
 	string inMapID = (theID + "-PosY");
 	if (triggerMap.count(theID) == 0) { return spawnPosY; }
@@ -164,7 +199,7 @@ void Carte::setName(string newName)
 	//printf("new name : %s\n", Name.c_str());
 }
 
-void Carte::setSpawnPoint(unsigned int newPosX, unsigned int newPosY)
+void Carte::setSpawnPoint(float newPosX, float newPosY)
 {
 	spawnPosX = newPosX;
 	spawnPosY = newPosY;
@@ -186,7 +221,7 @@ void Carte::setForeground(std::string newID)
 	ForegroundID = newID;
 }
 
-bool Carte::addPNJ(string newID, unsigned int newPosX, unsigned int newPosY)
+bool Carte::addPNJ(string newID, float newPosX, float newPosY)
 {
 	//printf("new PNJ : %s, %i, %i\n", newID.c_str(), newPosX, newPosY);
 	//return false;
@@ -195,7 +230,7 @@ bool Carte::addPNJ(string newID, unsigned int newPosX, unsigned int newPosY)
 	return true;
 }
 
-bool Carte::addMonster(string newID, unsigned int newPosX, unsigned int newPosY)
+bool Carte::addMonster(string newID, float newPosX, float newPosY)
 {
 	//printf("new Monster : %s, %i, %i\n", newID.c_str(), newPosX, newPosY);
 	//return false;
@@ -204,7 +239,7 @@ bool Carte::addMonster(string newID, unsigned int newPosX, unsigned int newPosY)
 	return true;
 }
 
-bool Carte::addChest(string newID, unsigned int newPosX, unsigned int newPosY)
+bool Carte::addChest(string newID, float newPosX, float newPosY)
 {
 	//printf("new Chest : %s, %i, %i\n", newID.c_str(), newPosX, newPosY);
 	//return false;
@@ -213,7 +248,7 @@ bool Carte::addChest(string newID, unsigned int newPosX, unsigned int newPosY)
 	return true;
 }
 
-bool Carte::addProps(string newID, unsigned int newPosX, unsigned int newPosY)
+bool Carte::addProps(string newID, float newPosX, float newPosY)
 {
 	//printf("new Props : %s, %i, %i\n", newID.c_str(), newPosX, newPosY);
 	//return false;
@@ -222,7 +257,7 @@ bool Carte::addProps(string newID, unsigned int newPosX, unsigned int newPosY)
 	return true;
 }
 
-bool Carte::addTrigger(string newID, unsigned int newPosX, unsigned int newPosY)
+bool Carte::addTrigger(string newID, float newPosX, float newPosY)
 {
 	//printf("new Trigger : %s, %i, %i\n", newID.c_str(), newPosX, newPosY);
 	//return false;
@@ -231,7 +266,7 @@ bool Carte::addTrigger(string newID, unsigned int newPosX, unsigned int newPosY)
 	return true;
 }
 
-bool Carte::addTriggerShort(string newID, unsigned int newPosX, unsigned int newPosY, unsigned int newWidth, unsigned int newHeight, string newSTPMap, string newSTPArrID)
+bool Carte::addTriggerShort(string newID, float newPosX, float newPosY, unsigned int newWidth, unsigned int newHeight, string newSTPMap, string newSTPArrID)
 {
 	//printf("new Trigger short : %s, %i, %i, %i, %i to %s(%s)\n", newID.c_str(), newPosX, newPosY, newWidth, newHeight, newSTPMap.c_str(), newSTPArrID.c_str());
 	//return false;
@@ -240,7 +275,7 @@ bool Carte::addTriggerShort(string newID, unsigned int newPosX, unsigned int new
 	return true;
 }
 
-bool Carte::addTPArrival(string newID, unsigned int newPosX, unsigned int newPosY)
+bool Carte::addTPArrival(string newID, float newPosX, float newPosY)
 {
 	//printf("new TPArrival : %s, %i, %i\n", newID.c_str(), newPosX, newPosY);
 	//return false;
@@ -259,7 +294,7 @@ void carte_js_setName(CScriptVar * v, void * userdata) {
 
 void carte_js_setSpawnPoint(CScriptVar * v, void * userdata) {
 	if (userdata == nullptr) { return; }
-	((Carte*)userdata)->setSpawnPoint(v->getParameter("newPosX")->getInt(), v->getParameter("newPosY")->getInt());
+	((Carte*)userdata)->setSpawnPoint((float)v->getParameter("newPosX")->getDouble(), (float)v->getParameter("newPosY")->getDouble());
 }
 
 void carte_js_setBrackground(CScriptVar * v, void * userdata)
@@ -282,60 +317,60 @@ void carte_js_setForeground(CScriptVar * v, void * userdata)
 
 void carte_js_addPNJ(CScriptVar * v, void * userdata) {
 	if (userdata == nullptr) { return; }
-	int curPNJPosX = v->getParameter("newPosX")->getInt();
-	int curPNJPosY = v->getParameter("newPosY")->getInt();
+	float curPosX = (float)v->getParameter("newPosX")->getDouble();
+	float curPosY = (float)v->getParameter("newPosY")->getDouble();
 	string curPNJID = v->getParameter("newID")->getString();
-	((Carte*)userdata)->addPNJ(curPNJID, curPNJPosX, curPNJPosY);
+	((Carte*)userdata)->addPNJ(curPNJID, curPosX, curPosY);
 }
 
 void carte_js_addMonster(CScriptVar * v, void * userdata) {
 	if (userdata == nullptr) { return; }
-	int curMonsterPosX = v->getParameter("newPosX")->getInt();
-	int curMonsterPosY = v->getParameter("newPosY")->getInt();
+	float curPosX = (float)v->getParameter("newPosX")->getDouble();
+	float curPosY = (float)v->getParameter("newPosY")->getDouble();
 	string curMonsterID = v->getParameter("newID")->getString();
-	((Carte*)userdata)->addMonster(curMonsterID, curMonsterPosX, curMonsterPosY);
+	((Carte*)userdata)->addMonster(curMonsterID, curPosX, curPosY);
 }
 
 void carte_js_addChest(CScriptVar * v, void * userdata) {
 	if (userdata == nullptr) { return; }
-	int curChestPosX = v->getParameter("newPosX")->getInt();
-	int curChestPosY = v->getParameter("newPosY")->getInt();
+	float curPosX = (float)v->getParameter("newPosX")->getDouble();
+	float curPosY = (float)v->getParameter("newPosY")->getDouble();
 	string curChestID = v->getParameter("newID")->getString();
-	((Carte*)userdata)->addChest(curChestID, curChestPosX, curChestPosY);
+	((Carte*)userdata)->addChest(curChestID, curPosX, curPosY);
 }
 
 void carte_js_addProps(CScriptVar * v, void * userdata) {
 	if (userdata == nullptr) { return; }
-	int curPropsPosX = v->getParameter("newPosX")->getInt();
-	int curPropsPosY = v->getParameter("newPosY")->getInt();
+	float curPosX = (float)v->getParameter("newPosX")->getDouble();
+	float curPosY = (float)v->getParameter("newPosY")->getDouble();
 	string curPropsID = v->getParameter("newID")->getString();
-	((Carte*)userdata)->addProps(curPropsID, curPropsPosX, curPropsPosY);
+	((Carte*)userdata)->addProps(curPropsID, curPosX, curPosY);
 }
 
 void carte_js_addTrigger(CScriptVar * v, void * userdata) {
 	if (userdata == nullptr) { return; }
-	int curTriggerPosX = v->getParameter("newPosX")->getInt();
-	int curTriggerPosY = v->getParameter("newPosY")->getInt();
+	float curPosX = (float)v->getParameter("newPosX")->getDouble();
+	float curPosY = (float)v->getParameter("newPosY")->getDouble();
 	string curTriggerID = v->getParameter("newID")->getString();
-	((Carte*)userdata)->addTrigger(curTriggerID, curTriggerPosX, curTriggerPosY);
+	((Carte*)userdata)->addTrigger(curTriggerID, curPosX, curPosY);
 }
 
 void carte_js_addTriggerShort(CScriptVar * v, void * userdata) {
 	if (userdata == nullptr) { return; }
-	int curTriggerPosX = v->getParameter("newPosX")->getInt();
-	int curTriggerPosY = v->getParameter("newPosY")->getInt();
+	float curPosX = (float)v->getParameter("newPosX")->getDouble();
+	float curPosY = (float)v->getParameter("newPosY")->getDouble();
 	int curTriggerWidth = v->getParameter("newWidth")->getInt();
 	int curTriggerHeight = v->getParameter("newHeight")->getInt();
 	string curTriggerID = v->getParameter("newID")->getString();
 	string newSTPMap = v->getParameter("newSTPMap")->getString();
 	string newSTPArrID = v->getParameter("newSTPArrID")->getString();
-	((Carte*)userdata)->addTriggerShort(curTriggerID, curTriggerPosX, curTriggerPosY, curTriggerWidth, curTriggerHeight, newSTPMap, newSTPArrID);
+	((Carte*)userdata)->addTriggerShort(curTriggerID, curPosX, curPosY, curTriggerWidth, curTriggerHeight, newSTPMap, newSTPArrID);
 }
 
 void carte_js_addTPArrival(CScriptVar * v, void * userdata) {
 	if (userdata == nullptr) { return; }
-	int curTPAPosX = v->getParameter("newPosX")->getInt();
-	int curTPAPosY = v->getParameter("newPosY")->getInt();
+	float curPosX = (float)v->getParameter("newPosX")->getDouble();
+	float curPosY = (float)v->getParameter("newPosY")->getDouble();
 	string curTPAID = v->getParameter("newID")->getString();
-	((Carte*)userdata)->addTPArrival(curTPAID, curTPAPosX, curTPAPosY);
+	((Carte*)userdata)->addTPArrival(curTPAID, curPosX, curPosY);
 }

@@ -21,11 +21,6 @@
 
 // TODO: faites référence ici aux en-têtes supplémentaires nécessaires au programme
 
-int doAPourcent(double Pourcent, int Maximum);
-int doAPourcentWithCenter(double Pourcent, int Maximum, int objTaille);
-int doAMap(int Cur, int MaxDep, int MaxArr);
-int doAMap(int Cur, int MinDep, int MaxDep, int MinArr, int MaxArr);
-
 bool checkColor(sf::Color ToTest1, sf::Color ToTest2);
 
 sf::IntRect getTextureIntRect(Player* ThePl, std::string AnimationID, sf::Time CurTime = sf::seconds(0.0));

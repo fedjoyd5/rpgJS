@@ -11,8 +11,8 @@ public:
 	Animator(std::string newAnimationID, unsigned int newNbImage, float newDurationToNextImg);
 	~Animator();
 
-	std::string getCurID();
-	std::string getZeroID();
+	std::string getCurIntRectID();
+	std::string getZeroIntRectID();
 
 	void nextImg();
 	void reset(sf::Time BaseTime);

@@ -9,23 +9,6 @@
 
 using namespace std;
 
-int doAPourcent(double Pourcent, int Maximum) {
-	return (int)((double)Maximum * (Pourcent / 100));
-}
-
-int doAPourcentWithCenter(double Pourcent, int Maximum, int objTaille) {
-	return (doAPourcent(Pourcent, Maximum) - (int)((double)objTaille / 2));
-}
-
-
-int doAMap(int Cur, int MaxDep, int MaxArr) {
-	return doAMap(Cur, 0, MaxDep, 0, MaxArr);
-}
-int doAMap(int Cur, int MinDep, int MaxDep, int MinArr, int MaxArr) {
-	double Pourcent = ((double)(Cur - MinDep) / (double)(MaxDep - MinDep));
-	return (int)((Pourcent * (MaxArr - MinArr)) + MinArr);
-}
-
 bool checkColor(sf::Color ToTest1, sf::Color ToTest2)
 {
 	if (ToTest1.r != ToTest2.r) { return false; }
@@ -39,14 +22,19 @@ sf::IntRect getTextureIntRect(Player * ThePl, std::string AnimationID, sf::Time 
 {
 	if (ThePl == nullptr) { return sf::IntRect(0, 0, 0, 0); }
 	Animator* TheAnim = ThePl->getAnimation(AnimationID);
-	if (TheAnim == nullptr) { return ThePl->getDefaultTexture(); }
+	if (TheAnim == nullptr) { return ThePl->getDefaultTextureIntRect(); }
 	TheAnim->CheckTimeAndNext(CurTime);
-	return ThePl->getPosTexture(TheAnim->getCurID());
+	return ThePl->getTextureIntRect(TheAnim->getCurIntRectID());
 }
 
 sf::IntRect getTextureIntRect(Trigger * TheTrigger, std::string AnimationID, sf::Time CurTime)
 {
-	return sf::IntRect();
+	if (TheTrigger == nullptr) { return sf::IntRect(0, 0, 0, 0); }
+	if (TheTrigger->isSimpleTP()) { return sf::IntRect(0, 0, 0, 0); }
+	Animator* TheAnim = TheTrigger->getAnimation(AnimationID);
+	if (TheAnim == nullptr) { return TheTrigger->getDefaultTextureIntRect(); }
+	TheAnim->CheckTimeAndNext(CurTime);
+	return TheTrigger->getTextureIntRect(TheAnim->getCurIntRectID());
 }
 
 sf::IntRect getTextureIntRect(Props * TheProps, std::string AnimationID, sf::Time CurTime)

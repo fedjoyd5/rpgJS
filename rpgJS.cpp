@@ -6,16 +6,31 @@
 
 #include "stdafx.h"
 
+#define WALKUP_AN "WalkUp"
+#define WALKDOWN_AN "WalkDown"
+#define WALKRIGHT_AN "WalkRight"
+#define WALKLEFT_AN "WalkLeft"
+#define BORDER_ADD 50.0
+
+#define BTN_DOWN sf::Keyboard::S
+#define BTN_RIGHT sf::Keyboard::D
+#define BTN_UP_AZERTY sf::Keyboard::Z
+#define BTN_LEFT_AZERTY sf::Keyboard::Q
+#define BTN_UP_QWERTY sf::Keyboard::W
+#define BTN_LEFT_QWERTY sf::Keyboard::A
+
 using namespace std;
 
 unsigned int width = 1500;
 unsigned int height = 800;
 bool fullscreen = false;
+bool azertyuiop = true;
 string DirPath("");
 
 enum Phase {
 	MainMenue,
 	InGame,
+	InCinematique,
 	InInventory,
 	InPause,
 };
@@ -45,6 +60,8 @@ int main(int argc, char *argv[])
 			StoryID = string(argv[indeArg]);
 		}
 		if (curArg == "-fullscreen") { fullscreen = true; }
+		if (curArg == "-zqsd") { azertyuiop = true; }
+		if (curArg == "-wasd") { azertyuiop = false; }
 	}
 
 	// ------------------ chargement de l'histoire --------------------------------
@@ -66,7 +83,7 @@ int main(int argc, char *argv[])
 	sf::RenderWindow window(sf::VideoMode(width, height), StoryID, (fullscreen ? sf::Style::Fullscreen : sf::Style::Default));
 	width = window.getSize().x;
 	height = window.getSize().y;
-	sf::View TheView(sf::FloatRect(0,0,width,height));
+	sf::View TheView(sf::FloatRect(0, 0, width, height));
 
 	// ------------------ creation du BG et du FG (et chargment du menu) --------------------------------
 
@@ -92,12 +109,14 @@ int main(int argc, char *argv[])
 	sf::RectangleShape* ForegroundShape = new sf::RectangleShape(sf::Vector2f(fgTexture.getSize()));
 	ForegroundShape->setTexture(&fgTexture);
 
-	// ------------------ sprite loading --------------------------------
+	// ----------------------------------------------------------------
 
-	sf::Texture playerTexture;
-	playerTexture.loadFromFile(TheStoryData.getPlayer()->getTexturePath());
-	sf::Sprite* spritePlayer = new sf::Sprite(playerTexture, TheStoryData.getPlayer()->getDefaultTexture());
-	spritePlayer->setOrigin(doAPourcent(50, TheStoryData.getPlayer()->getWidth()), TheStoryData.getPlayer()->getHeight());
+	vector<sf::Texture*> staticTextureList;
+	staticTextureList.push_back(new sf::Texture());
+	staticTextureList[0]->loadFromFile(TheStoryData.getPlayer()->getTexturePath());
+	TheStoryData.getPlayer()->setTexture(*staticTextureList[0]);
+
+	vector<sf::Texture*> DynamicTextureList;
 
 	// ------------------ meta loading --------------------------------
 
@@ -111,6 +130,8 @@ int main(int argc, char *argv[])
 
 	bool notRightBefore = true, notLeftBefore = true, notUpBefore = true, notDownBefore = true;
 	sf::Clock AnimationClock = sf::Clock();
+	vector<string> theChestLST, theMonsterLST, thePNJLST, thePropsLST, theTriggerLST;
+	Carte* TheSTMap = nullptr;
 
 	while (window.isOpen())
 	{
@@ -122,40 +143,10 @@ int main(int argc, char *argv[])
 				case sf::Event::Closed:
 					window.close();
 					break;
-				case sf::Event::KeyPressed:
-					if(sf::Keyboard::isKeyPressed(sf::Keyboard::Enter) && ActualPhase == Phase::MainMenue){
-						Carte* TheSTMap = TheStoryData.getStarter();
-						if (TheSTMap != nullptr) {
-							//printf("loading \"%s\"\n", TheSTMap->getBackgroundPath().c_str());
-							//printf("loading \"%s\"\n", TheSTMap->getForegroundPath().c_str());
-
-							bgTexture.loadFromFile(TheSTMap->getBackgroundPath());
-							delete BackgroundShape;
-							BackgroundShape = new sf::RectangleShape(sf::Vector2f(bgTexture.getSize()));
-							BackgroundShape->setTexture(&bgTexture);
-							//BackgroundShape->setFillColor(sf::Color::Blue);
-							//BackgroundShape->setOutlineThickness(10);
-							//BackgroundShape->setOutlineColor(sf::Color::Cyan);
-
-							fgTexture.loadFromFile(TheSTMap->getForegroundPath());
-							delete ForegroundShape;
-							ForegroundShape = new sf::RectangleShape(sf::Vector2f(fgTexture.getSize()));
-							ForegroundShape->setTexture(&fgTexture);
-
-							//printf("BackgroundShape size X: %0.2f, Y: %0.2f\n", BackgroundShape.getSize().x, BackgroundShape.getSize().y);
-							//printf("ForegroundShape size X: %0.2f, Y: %0.2f\n", ForegroundShape.getSize().x, ForegroundShape.getSize().y);
-
-							WAG.loadFromFile(TheSTMap->getWalkAbleGridPath());
-							TheView.setCenter(TheSTMap->getSpawnPosX(), TheSTMap->getSpawnPosY());
-
-							ActualPhase = Phase::InGame;
-							AnimationClock.restart();
-						}
-					}
-					break;
 				case sf::Event::MouseButtonPressed:
-					if (TheEvent.mouseButton.button == sf::Mouse::Left && ActualPhase == Phase::MainMenue && PlayButton.contains(TheEvent.mouseButton.x, TheEvent.mouseButton.y)) {
-						Carte* TheSTMap = TheStoryData.getStarter();
+				case sf::Event::KeyPressed:
+					if((sf::Keyboard::isKeyPressed(sf::Keyboard::Enter) && ActualPhase == Phase::MainMenue) || (TheEvent.mouseButton.button == sf::Mouse::Left && ActualPhase == Phase::MainMenue && PlayButton.contains(TheEvent.mouseButton.x, TheEvent.mouseButton.y))){
+						TheSTMap = TheStoryData.getStarter();
 						if (TheSTMap != nullptr) {
 							//printf("loading \"%s\"\n", TheSTMap->getBackgroundPath().c_str());
 							//printf("loading \"%s\"\n", TheSTMap->getForegroundPath().c_str());
@@ -177,7 +168,58 @@ int main(int argc, char *argv[])
 							//printf("ForegroundShape size X: %0.2f, Y: %0.2f\n", ForegroundShape.getSize().x, ForegroundShape.getSize().y);
 
 							WAG.loadFromFile(TheSTMap->getWalkAbleGridPath());
-							TheView.setCenter(TheSTMap->getSpawnPosX(), TheSTMap->getSpawnPosY());
+							TheStoryData.getPlayer()->setPosition(TheSTMap->getSpawnPosX(), TheSTMap->getSpawnPosY());
+							//TheView.setCenter(TheSTMap->getSpawnPosX(), TheSTMap->getSpawnPosY());
+
+							for (unsigned int dTextureIndex = 0; dTextureIndex < DynamicTextureList.size(); dTextureIndex++) { delete DynamicTextureList[dTextureIndex]; }
+							DynamicTextureList.clear();
+
+							theChestLST = TheSTMap->getChestIdList();
+							for (unsigned int theIndex = 0; theIndex < theChestLST.size(); theIndex++) {
+								Chest* curChest = TheSTMap->getChest(theChestLST[theIndex]);
+								unsigned int tempChestInd = DynamicTextureList.size();
+								DynamicTextureList.push_back(new sf::Texture());
+								DynamicTextureList[tempChestInd]->loadFromFile(curChest->getTexturePath());
+								curChest->setTexture(*DynamicTextureList[tempChestInd]);
+							}
+
+							theMonsterLST = TheSTMap->getMonsterIdList();
+							for (unsigned int theIndex = 0; theIndex < theMonsterLST.size(); theIndex++) {
+								Monster* curMonster = TheSTMap->getMonster(theMonsterLST[theIndex]);
+								unsigned int tempMonsterInd = DynamicTextureList.size();
+								DynamicTextureList.push_back(new sf::Texture());
+								DynamicTextureList[tempMonsterInd]->loadFromFile(curMonster->getTexturePath());
+								curMonster->setTexture(*DynamicTextureList[tempMonsterInd]);
+							}
+
+							thePNJLST = TheSTMap->getPNJIdList();
+							for (unsigned int theIndex = 0; theIndex < thePNJLST.size(); theIndex++) {
+								PNJ* curPNJ = TheSTMap->getPNJ(thePNJLST[theIndex]);
+								unsigned int tempPNJInd = DynamicTextureList.size();
+								DynamicTextureList.push_back(new sf::Texture());
+								DynamicTextureList[tempPNJInd]->loadFromFile(curPNJ->getTexturePath());
+								curPNJ->setTexture(*DynamicTextureList[tempPNJInd]);
+							}
+
+							thePropsLST = TheSTMap->getPropsIdList();
+							for (unsigned int theIndex = 0; theIndex < thePropsLST.size(); theIndex++) {
+								Props* curProps = TheSTMap->getProps(thePropsLST[theIndex]);
+								unsigned int tempPropsInd = DynamicTextureList.size();
+								DynamicTextureList.push_back(new sf::Texture());
+								DynamicTextureList[tempPropsInd]->loadFromFile(curProps->getTexturePath());
+								curProps->setTexture(*DynamicTextureList[tempPropsInd]);
+							}
+
+							theTriggerLST = TheSTMap->getTriggerIdList();
+							for (unsigned int theIndex = 0; theIndex < theTriggerLST.size(); theIndex++) {
+								Trigger* curTrigger = TheSTMap->getTrigger(theTriggerLST[theIndex]);
+								if (!curTrigger->isSimpleTP()) {
+									unsigned int tempTriggerInd = DynamicTextureList.size();
+									DynamicTextureList.push_back(new sf::Texture());
+									DynamicTextureList[tempTriggerInd]->loadFromFile(curTrigger->getTexturePath());
+									curTrigger->setTexture(*DynamicTextureList[tempTriggerInd]);
+								}
+							}
 
 							ActualPhase = Phase::InGame;
 							AnimationClock.restart();
@@ -189,92 +231,119 @@ int main(int argc, char *argv[])
 			}
 		}
 
-		// ------------------ check entré clavier pour les deplacement --------------------------------
+		// ------------------ player move (phase -> InGame) --------------------------------
 
-		int RightLeftDepl = 0;
-		int UpDownDepl = 0;
-		int PosXAct = TheView.getCenter().x;
-		int PosYAct = TheView.getCenter().y;
-		bool notRightActivate = true, notLeftActivate = true, notUpActivate = true, notDownActivate = true;
+		if (ActualPhase == Phase::InGame) {
+			int RightLeftDepl = 0;
+			int UpDownDepl = 0;
+			int PosXAct = TheStoryData.getPlayer()->getPosition().x;
+			int PosYAct = TheStoryData.getPlayer()->getPosition().y;
+			bool notRightActivate = true, notLeftActivate = true, notUpActivate = true, notDownActivate = true;
 
-		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right) && ActualPhase == Phase::InGame) {
-			RightLeftDepl = 1;
-			if (notRightBefore) {
-				Animator* TheAnim = TheStoryData.getPlayer()->getAnimation("WalkRight");
-				if (TheAnim != nullptr) { TheAnim->reset(AnimationClock.getElapsedTime()); }
-				notRightBefore = false;
+			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right) || sf::Keyboard::isKeyPressed(BTN_RIGHT)) {
+				RightLeftDepl = 1;
+				if (notRightBefore) {
+					TheStoryData.getPlayer()->resetAnimation(WALKRIGHT_AN, AnimationClock.getElapsedTime());
+					notRightBefore = false;
+				}
+				notRightActivate = false;
+				TheStoryData.getPlayer()->setTextureRect(getTextureIntRect(TheStoryData.getPlayer(), WALKRIGHT_AN, AnimationClock.getElapsedTime()));
 			}
-			notRightActivate = false;
-			spritePlayer->setTextureRect(getTextureIntRect(TheStoryData.getPlayer(), "WalkRight", AnimationClock.getElapsedTime()));
+			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left) || sf::Keyboard::isKeyPressed(azertyuiop ? BTN_LEFT_AZERTY : BTN_LEFT_QWERTY)) {
+				RightLeftDepl = -1;
+				if (notLeftBefore) {
+					TheStoryData.getPlayer()->resetAnimation(WALKLEFT_AN, AnimationClock.getElapsedTime());
+					notLeftBefore = false;
+				}
+				notLeftActivate = false;
+				TheStoryData.getPlayer()->setTextureRect(getTextureIntRect(TheStoryData.getPlayer(), WALKLEFT_AN, AnimationClock.getElapsedTime()));
+			}
+			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up) || sf::Keyboard::isKeyPressed(azertyuiop ? BTN_UP_AZERTY : BTN_UP_QWERTY)) {
+				UpDownDepl = -1;
+				if (notUpBefore) {
+					TheStoryData.getPlayer()->resetAnimation(WALKUP_AN, AnimationClock.getElapsedTime());
+					notUpBefore = false;
+				}
+				notUpActivate = false;
+				TheStoryData.getPlayer()->setTextureRect(getTextureIntRect(TheStoryData.getPlayer(), WALKUP_AN, AnimationClock.getElapsedTime()));
+			}
+			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down) || sf::Keyboard::isKeyPressed(BTN_DOWN)) {
+				UpDownDepl = 1;
+				if (notDownBefore) {
+					TheStoryData.getPlayer()->resetAnimation(WALKDOWN_AN, AnimationClock.getElapsedTime());
+					notDownBefore = false;
+				}
+				notDownActivate = false;
+				TheStoryData.getPlayer()->setTextureRect(getTextureIntRect(TheStoryData.getPlayer(), WALKDOWN_AN, AnimationClock.getElapsedTime()));
+			}
+
+			if (notRightActivate && !notRightBefore) { notRightBefore = true; TheStoryData.getPlayer()->setTextureRect(TheStoryData.getPlayer()->getAnimationZeroIntRect(WALKRIGHT_AN)); }
+			if (notLeftActivate && !notLeftBefore) { notLeftBefore = true; TheStoryData.getPlayer()->setTextureRect(TheStoryData.getPlayer()->getAnimationZeroIntRect(WALKLEFT_AN)); }
+			if (notUpActivate && !notUpBefore) { notUpBefore = true; TheStoryData.getPlayer()->setTextureRect(TheStoryData.getPlayer()->getAnimationZeroIntRect(WALKUP_AN)); }
+			if (notDownActivate && !notDownBefore) { notDownBefore = true; TheStoryData.getPlayer()->setTextureRect(TheStoryData.getPlayer()->getAnimationZeroIntRect(WALKDOWN_AN)); }
+
+			if (sf::FloatRect(0, 0, WAG.getSize().x, WAG.getSize().y).contains((PosXAct + RightLeftDepl), (PosYAct + UpDownDepl))) {
+				bool depPasFait = true;
+				if (!checkColor(WAG.getPixel((PosXAct + RightLeftDepl), (PosYAct + UpDownDepl)), sf::Color(0, 0, 0, 255))) {
+					TheStoryData.getPlayer()->move(((float)RightLeftDepl)*TheStoryData.getPlayer()->getSpeed(), ((float)UpDownDepl)*TheStoryData.getPlayer()->getSpeed());
+					depPasFait = false;
+				}
+				if (!checkColor(WAG.getPixel(PosXAct, (PosYAct + UpDownDepl)), sf::Color(0, 0, 0, 255)) && depPasFait) {
+					TheStoryData.getPlayer()->move(0, ((float)UpDownDepl)*TheStoryData.getPlayer()->getSpeed());
+					depPasFait = false;
+				}
+				if (!checkColor(WAG.getPixel((PosXAct + RightLeftDepl), PosYAct), sf::Color(0, 0, 0, 255)) && depPasFait) {
+					TheStoryData.getPlayer()->move(((float)RightLeftDepl)*TheStoryData.getPlayer()->getSpeed(), 0);
+					depPasFait = false;
+				}
+			}
+			//spritePlayer->setPosition(TheView.getCenter());
+
+			TheView.setCenter(TheStoryData.getPlayer()->getPosition());
 		}
-		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left) && ActualPhase == Phase::InGame) {
-			RightLeftDepl = -1;
-			if (notLeftBefore) {
-				Animator* TheAnim = TheStoryData.getPlayer()->getAnimation("WalkLeft");
-				if (TheAnim != nullptr) { TheAnim->reset(AnimationClock.getElapsedTime()); }
-				notLeftBefore = false;
-			}
-			notLeftActivate = false;
-			spritePlayer->setTextureRect(getTextureIntRect(TheStoryData.getPlayer(), "WalkLeft", AnimationClock.getElapsedTime()));
-		}
-		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up) && ActualPhase == Phase::InGame) {
-			UpDownDepl = -1;
-			if (notUpBefore) {
-				Animator* TheAnim = TheStoryData.getPlayer()->getAnimation("WalkUp");
-				if (TheAnim != nullptr) { TheAnim->reset(AnimationClock.getElapsedTime()); }
-				notUpBefore = false;
-			}
-			notUpActivate = false;
-			spritePlayer->setTextureRect(getTextureIntRect(TheStoryData.getPlayer(), "WalkUp", AnimationClock.getElapsedTime()));
-		}
-		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down) && ActualPhase == Phase::InGame) {
-			UpDownDepl = 1;
-			if (notDownBefore) {
-				Animator* TheAnim = TheStoryData.getPlayer()->getAnimation("WalkDown");
-				if (TheAnim != nullptr) { TheAnim->reset(AnimationClock.getElapsedTime()); }
-				notDownBefore = false;
-			}
-			notDownActivate = false;
-			spritePlayer->setTextureRect(getTextureIntRect(TheStoryData.getPlayer(), "WalkDown", AnimationClock.getElapsedTime()));
-		}
 
-		if (notRightActivate && !notRightBefore) { notRightBefore = true; spritePlayer->setTextureRect(TheStoryData.getPlayer()->getPosTexture("WalkRight-0")); }
-		if (notLeftActivate && !notLeftBefore) { notLeftBefore = true; spritePlayer->setTextureRect(TheStoryData.getPlayer()->getPosTexture("WalkLeft-0")); }
-		if (notUpActivate && !notUpBefore) { notUpBefore = true; spritePlayer->setTextureRect(TheStoryData.getPlayer()->getPosTexture("WalkUp-0")); }
-		if (notDownActivate && !notDownBefore) { notDownBefore = true; spritePlayer->setTextureRect(TheStoryData.getPlayer()->getPosTexture("WalkDown-0")); }
+		// ------------------ TheView move (phase -> InCinematique) --------------------------------
 
-		if (sf::FloatRect(0, 0, WAG.getSize().x, WAG.getSize().y).contains((PosXAct + RightLeftDepl), (PosYAct + UpDownDepl))) {
-			bool depPasFait = true;
-			if (!checkColor(WAG.getPixel((PosXAct + RightLeftDepl), (PosYAct + UpDownDepl)), sf::Color(0, 0, 0, 255))) {
-				TheView.move(((float)RightLeftDepl)*TheStoryData.getPlayer()->getSpeed(), ((float)UpDownDepl)*TheStoryData.getPlayer()->getSpeed());
-				depPasFait = false;
-			}
-			if (!checkColor(WAG.getPixel(PosXAct, (PosYAct + UpDownDepl)), sf::Color(0, 0, 0, 255)) && depPasFait) {
-				TheView.move(0, ((float)UpDownDepl)*TheStoryData.getPlayer()->getSpeed());
-				depPasFait = false;
-			}
-			if (!checkColor(WAG.getPixel((PosXAct + RightLeftDepl), PosYAct), sf::Color(0, 0, 0, 255)) && depPasFait) {
-				TheView.move(((float)RightLeftDepl)*TheStoryData.getPlayer()->getSpeed(), 0);
-				depPasFait = false;
-			}
-		}
-		spritePlayer->setPosition(TheView.getCenter());
+		if (ActualPhase == Phase::InCinematique) {}
 
-		// ------------------ traitement des info --------------------------------
+		// ------------------ traitement des info --------------------------------------------------
 
-		// ------------------ dessin du rendu sur la fenetre --------------------------------
+		// ------------------ dessin du rendu sur la fenetre ---------------------------------------
+
+		sf::FloatRect floatRectVeiw(TheView.getCenter().x - (((double)width / 2) + BORDER_ADD), TheView.getCenter().y - (((double)height / 2) + BORDER_ADD), width + (BORDER_ADD*2), height + (BORDER_ADD*2));
 
 		window.clear();
 		switch (ActualPhase) {
 		case Phase::MainMenue:
 			window.draw(*BackgroundShape);
 			break;
+		case Phase::InCinematique:
 		case Phase::InGame:
 			window.setView(TheView);
 
 			window.draw(*BackgroundShape);
-			window.draw(*spritePlayer);
-			window.draw(*ForegroundShape);
+			for (unsigned int it = 0; it < theChestLST.size(); it++) {
+				Chest* theChest = TheSTMap->getChest(theChestLST[it]);
+				if (floatRectVeiw.contains(theChest->getPosition())) { window.draw(*theChest); }
+			}
+			for (unsigned int it = 0; it < theMonsterLST.size(); it++) {
+				Monster* theMonster = TheSTMap->getMonster(theMonsterLST[it]);
+				if (floatRectVeiw.contains(theMonster->getPosition())) { window.draw(*theMonster); }
+			}
+			for (unsigned int it = 0; it < thePNJLST.size(); it++) {
+				PNJ* thePNJ = TheSTMap->getPNJ(thePNJLST[it]);
+				if (floatRectVeiw.contains(thePNJ->getPosition())) { window.draw(*thePNJ); }
+			}
+			for (unsigned int it = 0; it < thePropsLST.size(); it++) {
+				Props* theProps = TheSTMap->getProps(thePropsLST[it]);
+				if (floatRectVeiw.contains(theProps->getPosition())) { window.draw(*theProps); }
+			}
+			for (unsigned int it = 0; it < theTriggerLST.size(); it++) {
+				Trigger* theTrigger = TheSTMap->getTrigger(theTriggerLST[it]);
+				if (floatRectVeiw.contains(theTrigger->getPosition())) { window.draw(*theTrigger); }
+			}
+			window.draw(*TheStoryData.getPlayer());
+			//window.draw(*ForegroundShape);
 			break;
 		default:
 			break;
@@ -284,7 +353,10 @@ int main(int argc, char *argv[])
 
 	delete BackgroundShape;
 	delete ForegroundShape;
-	delete spritePlayer;
-
+	for (unsigned int sTextureIndex = 0; sTextureIndex < staticTextureList.size(); sTextureIndex++) { delete staticTextureList[sTextureIndex]; }
+	staticTextureList.clear();
+	for (unsigned int dTextureIndex = 0; dTextureIndex < DynamicTextureList.size(); dTextureIndex++) { delete DynamicTextureList[dTextureIndex]; }
+	DynamicTextureList.clear();
+	
     return EXIT_SUCCESS;
 }

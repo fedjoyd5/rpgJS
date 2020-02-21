@@ -36,6 +36,8 @@ gameStoryData::gameStoryData(string newPath, string newID)
 		printf("(ERROR) in %s(%s) : %s\n", ID.c_str(), (Path + ID + "/index.js").c_str(), e->text.c_str());
 	}
 
+	thePlayer.initialize();
+
 	for (map<string, Item>::iterator iteraItem = itemMap.begin(); iteraItem != itemMap.end(); iteraItem++) {
 		iteraItem->second.initialize();
 	}

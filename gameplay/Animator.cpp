@@ -29,11 +29,11 @@ Animator::~Animator()
 {
 }
 
-std::string Animator::getCurID() {
+std::string Animator::getCurIntRectID() {
 	return (AnimationId + "-" + to_string(CurrentImg));
 }
 
-std::string Animator::getZeroID()
+std::string Animator::getZeroIntRectID()
 {
 	return (AnimationId + "-0");
 }

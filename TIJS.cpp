@@ -2,6 +2,23 @@
 
 using namespace std;
 
+int doAPourcent(double Pourcent, int Maximum) {
+	return (int)((double)Maximum * (Pourcent / 100));
+}
+
+int doAPourcentWithCenter(double Pourcent, int Maximum, int objTaille) {
+	return (doAPourcent(Pourcent, Maximum) - (int)((double)objTaille / 2));
+}
+
+
+int doAMap(int Cur, int MaxDep, int MaxArr) {
+	return doAMap(Cur, 0, MaxDep, 0, MaxArr);
+}
+int doAMap(int Cur, int MinDep, int MaxDep, int MinArr, int MaxArr) {
+	double Pourcent = ((double)(Cur - MinDep) / (double)(MaxDep - MinDep));
+	return (int)((Pourcent * (MaxArr - MinArr)) + MinArr);
+}
+
 CTinyJS* getNewJSContext() {
 	CTinyJS *js = new CTinyJS();
 	/* add the functions from TinyJS_Functions.cpp */
