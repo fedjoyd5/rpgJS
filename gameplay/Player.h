@@ -19,7 +19,6 @@ public:
 
 	void registerPlayerInitiFunction(CTinyJS* TheJSC);
 	std::string getName();
-	float getSpeed();
 	unsigned int getWidth();
 	unsigned int getHeight();
 
@@ -31,16 +30,25 @@ public:
 	void resetAnimation(std::string theAnimationID, sf::Time newElapsedTime);
 
 	void initialize();
+
+	void moveRight(sf::Time newElapsedTime);
+	void moveLeft(sf::Time newElapsedTime);
+	void moveUp(sf::Time newElapsedTime);
+	void moveDown(sf::Time newElapsedTime);
+	void checkMove(sf::Image theWAG);
 private:
 	std::string name;
 	std::string Path;
 	float speed;
 
 	std::string textureID;
-	unsigned int width;
-	unsigned int height;
+	unsigned int width, height;
 	std::map<std::string, sf::IntRect> mapTextureIntRect;
 	std::map<std::string, Animator> mapAnimator;
+
+	bool notRightBefore, notLeftBefore, notUpBefore, notDownBefore;
+	bool notRightActivate, notLeftActivate, notUpActivate, notDownActivate;
+	float RightLeftDepl, UpDownDepl;
 public:
 	void setName(std::string newName);
 	void setSpeed(float newSpeed);

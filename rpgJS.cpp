@@ -6,10 +6,6 @@
 
 #include "stdafx.h"
 
-#define WALKUP_AN "WalkUp"
-#define WALKDOWN_AN "WalkDown"
-#define WALKRIGHT_AN "WalkRight"
-#define WALKLEFT_AN "WalkLeft"
 #define BORDER_ADD 50.0
 
 #define BTN_DOWN sf::Keyboard::S
@@ -128,13 +124,22 @@ int main(int argc, char *argv[])
 
 	// ------------------ debut du programme en interaction avec le joueur --------------------------------
 
-	bool notRightBefore = true, notLeftBefore = true, notUpBefore = true, notDownBefore = true;
-	sf::Clock AnimationClock = sf::Clock();
+	sf::Clock Timer = sf::Clock();
 	vector<string> theChestLST, theMonsterLST, thePNJLST, thePropsLST, theTriggerLST;
 	Carte* TheSTMap = nullptr;
 
+	/*sf::Clock Fpscounter = sf::Clock();
+	int theCounter = 0;*/
+
 	while (window.isOpen())
 	{
+		/*theCounter = theCounter + 1;
+		if (Fpscounter.getElapsedTime() >= sf::seconds(1.0)) {
+			printf("- %i image/s\n", theCounter);
+			Fpscounter.restart();
+			theCounter = 0;
+		}*/
+
 		// ------------------ check des evenements --------------------------------
 
 		sf::Event TheEvent;
@@ -222,7 +227,7 @@ int main(int argc, char *argv[])
 							}
 
 							ActualPhase = Phase::InGame;
-							AnimationClock.restart();
+							Timer.restart();
 						}
 					}
 					break;
@@ -233,72 +238,13 @@ int main(int argc, char *argv[])
 
 		// ------------------ player move (phase -> InGame) --------------------------------
 
-		if (ActualPhase == Phase::InGame) {
-			int RightLeftDepl = 0;
-			int UpDownDepl = 0;
-			int PosXAct = TheStoryData.getPlayer()->getPosition().x;
-			int PosYAct = TheStoryData.getPlayer()->getPosition().y;
-			bool notRightActivate = true, notLeftActivate = true, notUpActivate = true, notDownActivate = true;
+		if (ActualPhase == Phase::InGame && TheStoryData.getPlayer() != nullptr) {
+			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right) || sf::Keyboard::isKeyPressed(BTN_RIGHT)) { TheStoryData.getPlayer()->moveRight(Timer.getElapsedTime()); }
+			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left) || sf::Keyboard::isKeyPressed(azertyuiop ? BTN_LEFT_AZERTY : BTN_LEFT_QWERTY)) { TheStoryData.getPlayer()->moveLeft(Timer.getElapsedTime()); }
+			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up) || sf::Keyboard::isKeyPressed(azertyuiop ? BTN_UP_AZERTY : BTN_UP_QWERTY)) { TheStoryData.getPlayer()->moveUp(Timer.getElapsedTime()); }
+			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down) || sf::Keyboard::isKeyPressed(BTN_DOWN)) { TheStoryData.getPlayer()->moveDown(Timer.getElapsedTime()); }
 
-			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right) || sf::Keyboard::isKeyPressed(BTN_RIGHT)) {
-				RightLeftDepl = 1;
-				if (notRightBefore) {
-					TheStoryData.getPlayer()->resetAnimation(WALKRIGHT_AN, AnimationClock.getElapsedTime());
-					notRightBefore = false;
-				}
-				notRightActivate = false;
-				TheStoryData.getPlayer()->setTextureRect(getTextureIntRect(TheStoryData.getPlayer(), WALKRIGHT_AN, AnimationClock.getElapsedTime()));
-			}
-			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left) || sf::Keyboard::isKeyPressed(azertyuiop ? BTN_LEFT_AZERTY : BTN_LEFT_QWERTY)) {
-				RightLeftDepl = -1;
-				if (notLeftBefore) {
-					TheStoryData.getPlayer()->resetAnimation(WALKLEFT_AN, AnimationClock.getElapsedTime());
-					notLeftBefore = false;
-				}
-				notLeftActivate = false;
-				TheStoryData.getPlayer()->setTextureRect(getTextureIntRect(TheStoryData.getPlayer(), WALKLEFT_AN, AnimationClock.getElapsedTime()));
-			}
-			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up) || sf::Keyboard::isKeyPressed(azertyuiop ? BTN_UP_AZERTY : BTN_UP_QWERTY)) {
-				UpDownDepl = -1;
-				if (notUpBefore) {
-					TheStoryData.getPlayer()->resetAnimation(WALKUP_AN, AnimationClock.getElapsedTime());
-					notUpBefore = false;
-				}
-				notUpActivate = false;
-				TheStoryData.getPlayer()->setTextureRect(getTextureIntRect(TheStoryData.getPlayer(), WALKUP_AN, AnimationClock.getElapsedTime()));
-			}
-			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down) || sf::Keyboard::isKeyPressed(BTN_DOWN)) {
-				UpDownDepl = 1;
-				if (notDownBefore) {
-					TheStoryData.getPlayer()->resetAnimation(WALKDOWN_AN, AnimationClock.getElapsedTime());
-					notDownBefore = false;
-				}
-				notDownActivate = false;
-				TheStoryData.getPlayer()->setTextureRect(getTextureIntRect(TheStoryData.getPlayer(), WALKDOWN_AN, AnimationClock.getElapsedTime()));
-			}
-
-			if (notRightActivate && !notRightBefore) { notRightBefore = true; TheStoryData.getPlayer()->setTextureRect(TheStoryData.getPlayer()->getAnimationZeroIntRect(WALKRIGHT_AN)); }
-			if (notLeftActivate && !notLeftBefore) { notLeftBefore = true; TheStoryData.getPlayer()->setTextureRect(TheStoryData.getPlayer()->getAnimationZeroIntRect(WALKLEFT_AN)); }
-			if (notUpActivate && !notUpBefore) { notUpBefore = true; TheStoryData.getPlayer()->setTextureRect(TheStoryData.getPlayer()->getAnimationZeroIntRect(WALKUP_AN)); }
-			if (notDownActivate && !notDownBefore) { notDownBefore = true; TheStoryData.getPlayer()->setTextureRect(TheStoryData.getPlayer()->getAnimationZeroIntRect(WALKDOWN_AN)); }
-
-			if (sf::FloatRect(0, 0, WAG.getSize().x, WAG.getSize().y).contains((PosXAct + RightLeftDepl), (PosYAct + UpDownDepl))) {
-				bool depPasFait = true;
-				if (!checkColor(WAG.getPixel((PosXAct + RightLeftDepl), (PosYAct + UpDownDepl)), sf::Color(0, 0, 0, 255))) {
-					TheStoryData.getPlayer()->move(((float)RightLeftDepl)*TheStoryData.getPlayer()->getSpeed(), ((float)UpDownDepl)*TheStoryData.getPlayer()->getSpeed());
-					depPasFait = false;
-				}
-				if (!checkColor(WAG.getPixel(PosXAct, (PosYAct + UpDownDepl)), sf::Color(0, 0, 0, 255)) && depPasFait) {
-					TheStoryData.getPlayer()->move(0, ((float)UpDownDepl)*TheStoryData.getPlayer()->getSpeed());
-					depPasFait = false;
-				}
-				if (!checkColor(WAG.getPixel((PosXAct + RightLeftDepl), PosYAct), sf::Color(0, 0, 0, 255)) && depPasFait) {
-					TheStoryData.getPlayer()->move(((float)RightLeftDepl)*TheStoryData.getPlayer()->getSpeed(), 0);
-					depPasFait = false;
-				}
-			}
-			//spritePlayer->setPosition(TheView.getCenter());
-
+			TheStoryData.getPlayer()->checkMove(WAG);
 			TheView.setCenter(TheStoryData.getPlayer()->getPosition());
 		}
 

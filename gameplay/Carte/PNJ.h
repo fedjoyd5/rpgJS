@@ -15,7 +15,6 @@ public:
 	~PNJ();
 
 	void initialize();
-	float getSpeed();
 	unsigned int getWidth();
 	unsigned int getHeight();
 

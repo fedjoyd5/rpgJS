@@ -53,11 +53,6 @@ void Monster::initialize()
 	if (theJSContext != nullptr) { delete theJSContext; }
 }
 
-float Monster::getSpeed()
-{
-	return speed;
-}
-
 unsigned int Monster::getWidth()
 {
 	return width;
@@ -109,6 +104,8 @@ void Monster::resetAnimation(std::string theAnimationID, sf::Time newElapsedTime
 
 void Monster::setSpeed(float newSpeed)
 {
+	if (newSpeed < 0.01) { speed = 0.01; return; }
+	if (newSpeed > 2.00) { speed = 1.00; return; }
 	speed = newSpeed;
 }
 

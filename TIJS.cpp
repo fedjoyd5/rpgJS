@@ -2,6 +2,15 @@
 
 using namespace std;
 
+bool checkColor(sf::Color ToTest1, sf::Color ToTest2)
+{
+	if (ToTest1.r != ToTest2.r) { return false; }
+	if (ToTest1.g != ToTest2.g) { return false; }
+	if (ToTest1.b != ToTest2.b) { return false; }
+	if (ToTest1.a != ToTest2.a) { return false; }
+	return true;
+}
+
 int doAPourcent(double Pourcent, int Maximum) {
 	return (int)((double)Maximum * (Pourcent / 100));
 }

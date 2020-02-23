@@ -21,8 +21,6 @@
 
 // TODO: faites référence ici aux en-têtes supplémentaires nécessaires au programme
 
-bool checkColor(sf::Color ToTest1, sf::Color ToTest2);
-
 sf::IntRect getTextureIntRect(Player* ThePl, std::string AnimationID, sf::Time CurTime = sf::seconds(0.0));
 sf::IntRect getTextureIntRect(Trigger* TheTrigger, std::string AnimationID, sf::Time CurTime = sf::seconds(0.0));
 sf::IntRect getTextureIntRect(Props* TheProps, std::string AnimationID, sf::Time CurTime = sf::seconds(0.0));

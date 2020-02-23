@@ -5,10 +5,19 @@
 #include <vector>
 #include <map>
 #include <iterator>
+#include <SFML/Graphics/Color.hpp>
 
 #include "TJS\TinyJS.h"
 #include "TJS\TinyJS_Functions.h"
 #include "TJS\TinyJS_MathFunctions.h"
+
+#define WALKUP_AN "WalkUp"
+#define WALKDOWN_AN "WalkDown"
+#define WALKRIGHT_AN "WalkRight"
+#define WALKLEFT_AN "WalkLeft"
+#define NO_WALK_COLOR sf::Color(0, 0, 0, 255)
+
+bool checkColor(sf::Color ToTest1, sf::Color ToTest2);
 
 int doAPourcent(double Pourcent, int Maximum);
 int doAPourcentWithCenter(double Pourcent, int Maximum, int objTaille);
