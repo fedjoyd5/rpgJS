@@ -14,6 +14,7 @@ public:
 	Monster(std::string newID, std::string newPath, float newPosX, float newPosY);
 	~Monster();
 
+	std::string getID();
 	void initialize();
 	unsigned int getWidth();
 	unsigned int getHeight();
@@ -24,6 +25,12 @@ public:
 	Animator* getAnimation(std::string theAnimationID);
 	sf::IntRect getAnimationZeroIntRect(std::string theAnimationID);
 	void resetAnimation(std::string theAnimationID, sf::Time newElapsedTime);
+
+	void moveRight(sf::Time newElapsedTime);
+	void moveLeft(sf::Time newElapsedTime);
+	void moveUp(sf::Time newElapsedTime);
+	void moveDown(sf::Time newElapsedTime);
+	void checkMove(sf::Image theWAG);
 private:
 	std::string ID;
 	std::string Path;
@@ -34,6 +41,10 @@ private:
 	unsigned int height;
 	std::map<std::string, sf::IntRect> mapTextureIntRect;
 	std::map<std::string, Animator> mapAnimator;
+
+	bool notRightBefore, notLeftBefore, notUpBefore, notDownBefore;
+	bool notRightActivate, notLeftActivate, notUpActivate, notDownActivate;
+	float RightLeftDepl, UpDownDepl;
 public:
 	void setSpeed(float newSpeed);
 

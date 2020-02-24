@@ -28,6 +28,11 @@ Monster::~Monster()
 {
 }
 
+std::string Monster::getID()
+{
+	return ID;
+}
+
 void Monster::initialize()
 {
 	CTinyJS* theJSContext = nullptr;
@@ -100,6 +105,100 @@ void Monster::resetAnimation(std::string theAnimationID, sf::Time newElapsedTime
 {
 	if (mapAnimator.count(theAnimationID) == 0) { return; }
 	mapAnimator[theAnimationID].reset(newElapsedTime);
+}
+
+void Monster::moveRight(sf::Time newElapsedTime)
+{
+	RightLeftDepl = 1;
+	if (notRightBefore) {
+		resetAnimation(WALKRIGHT_AN, newElapsedTime);
+		notRightBefore = false;
+	}
+	notRightActivate = false;
+
+	Animator* theAnim = getAnimation(WALKRIGHT_AN);
+	if (theAnim != nullptr) {
+		theAnim->CheckTimeAndNext(newElapsedTime);
+		setTextureRect(getTextureIntRect(theAnim->getCurIntRectID()));
+	} else { setTextureRect(getDefaultTextureIntRect()); }
+}
+
+void Monster::moveLeft(sf::Time newElapsedTime)
+{
+	RightLeftDepl = -1;
+	if (notLeftBefore) {
+		resetAnimation(WALKLEFT_AN, newElapsedTime);
+		notLeftBefore = false;
+	}
+	notLeftActivate = false;
+
+	Animator* theAnim = getAnimation(WALKLEFT_AN);
+	if (theAnim != nullptr) {
+		theAnim->CheckTimeAndNext(newElapsedTime);
+		setTextureRect(getTextureIntRect(theAnim->getCurIntRectID()));
+	} else { setTextureRect(getDefaultTextureIntRect()); }
+}
+
+void Monster::moveUp(sf::Time newElapsedTime)
+{
+	UpDownDepl = -1;
+	if (notUpBefore) {
+		resetAnimation(WALKUP_AN, newElapsedTime);
+		notUpBefore = false;
+	}
+	notUpActivate = false;
+
+	Animator* theAnim = getAnimation(WALKUP_AN);
+	if (theAnim != nullptr) {
+		theAnim->CheckTimeAndNext(newElapsedTime);
+		setTextureRect(getTextureIntRect(theAnim->getCurIntRectID()));
+	} else { setTextureRect(getDefaultTextureIntRect()); }
+}
+
+void Monster::moveDown(sf::Time newElapsedTime)
+{
+	UpDownDepl = -1;
+	if (notUpBefore) {
+		resetAnimation(WALKUP_AN, newElapsedTime);
+		notUpBefore = false;
+	}
+	notUpActivate = false;
+
+	Animator* theAnim = getAnimation(WALKUP_AN);
+	if (theAnim != nullptr) {
+		theAnim->CheckTimeAndNext(newElapsedTime);
+		setTextureRect(getTextureIntRect(theAnim->getCurIntRectID()));
+	} else { setTextureRect(getDefaultTextureIntRect()); }
+}
+
+void Monster::checkMove(sf::Image theWAG)
+{
+	if (notRightActivate && !notRightBefore) { notRightBefore = true; setTextureRect(getAnimationZeroIntRect(WALKRIGHT_AN)); }
+	if (notLeftActivate && !notLeftBefore) { notLeftBefore = true; setTextureRect(getAnimationZeroIntRect(WALKLEFT_AN)); }
+	if (notUpActivate && !notUpBefore) { notUpBefore = true; setTextureRect(getAnimationZeroIntRect(WALKUP_AN)); }
+	if (notDownActivate && !notDownBefore) { notDownBefore = true; setTextureRect(getAnimationZeroIntRect(WALKDOWN_AN)); }
+
+	float PosXAct = getPosition().x;
+	float PosYAct = getPosition().y;
+
+	if (sf::FloatRect(0, 0, theWAG.getSize().x, theWAG.getSize().y).contains((PosXAct + RightLeftDepl), (PosYAct + UpDownDepl))) {
+		bool depPasFait = true;
+		if (!checkColor(theWAG.getPixel((PosXAct + RightLeftDepl), (PosYAct + UpDownDepl)), NO_WALK_COLOR)) {
+			move(RightLeftDepl*speed, UpDownDepl*speed);
+			depPasFait = false;
+		}
+		if (!checkColor(theWAG.getPixel(PosXAct, (PosYAct + UpDownDepl)), NO_WALK_COLOR) && depPasFait) {
+			move(0, UpDownDepl*speed);
+			depPasFait = false;
+		}
+		if (!checkColor(theWAG.getPixel((PosXAct + RightLeftDepl), PosYAct), NO_WALK_COLOR) && depPasFait) {
+			move(RightLeftDepl*speed, 0);
+			depPasFait = false;
+		}
+	}
+
+	notRightActivate = true, notLeftActivate = true, notUpActivate = true, notDownActivate = true;
+	RightLeftDepl = 0, UpDownDepl = 0;
 }
 
 void Monster::setSpeed(float newSpeed)

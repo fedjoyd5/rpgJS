@@ -27,6 +27,11 @@ Chest::~Chest()
 }
 
 
+std::string Chest::getID()
+{
+	return ID;
+}
+
 void Chest::initialize()
 {
 	CTinyJS* theJSContext = nullptr;
@@ -46,7 +51,7 @@ void Chest::initialize()
 		}
 
 		setTextureRect(getDefaultTextureIntRect());
-		setOrigin(doAPourcent(50, width), doAPourcent(50, height));
+		setOrigin(doAPourcent(50, width), height);
 	}
 	if (theJSContext != nullptr) { delete theJSContext; }
 }
@@ -59,6 +64,12 @@ unsigned int Chest::getWidth()
 unsigned int Chest::getHeight()
 {
 	return height;
+}
+
+bool Chest::canInteract(sf::Vector2f playerPos)
+{
+	sf::FloatRect theRectToTest(getPosition().x - (((float)width / 2) + RAYON_TO_ACTIVATE), getPosition().y - ((float)height + RAYON_TO_ACTIVATE), (width + (2 * RAYON_TO_ACTIVATE)), (height + (2 * RAYON_TO_ACTIVATE)));
+	return theRectToTest.contains(playerPos);
 }
 
 std::string Chest::getTexturePath()

@@ -26,6 +26,11 @@ Props::~Props()
 {
 }
 
+std::string Props::getID()
+{
+	return ID;
+}
+
 void Props::initialize()
 {
 	CTinyJS* theJSContext = nullptr;
@@ -45,7 +50,7 @@ void Props::initialize()
 		}
 
 		setTextureRect(getDefaultTextureIntRect());
-		setOrigin(doAPourcent(50, width), doAPourcent(50, height));
+		setOrigin(doAPourcent(50, width), height);
 	}
 	if (theJSContext != nullptr) { delete theJSContext; }
 }
@@ -58,6 +63,12 @@ unsigned int Props::getWidth()
 unsigned int Props::getHeight()
 {
 	return height;
+}
+
+bool Props::canInteract(sf::Vector2f playerPos)
+{
+	sf::FloatRect theRectToTest(getPosition().x - (((float)width / 2) + RAYON_TO_ACTIVATE), getPosition().y - ((float)height + RAYON_TO_ACTIVATE), (width + (2 * RAYON_TO_ACTIVATE)), (height + (2 * RAYON_TO_ACTIVATE)));
+	return theRectToTest.contains(playerPos);
 }
 
 std::string Props::getTexturePath()

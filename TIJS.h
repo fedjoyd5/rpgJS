@@ -16,6 +16,7 @@
 #define WALKRIGHT_AN "WalkRight"
 #define WALKLEFT_AN "WalkLeft"
 #define NO_WALK_COLOR sf::Color(0, 0, 0, 255)
+#define RAYON_TO_ACTIVATE 40
 
 bool checkColor(sf::Color ToTest1, sf::Color ToTest2);
 

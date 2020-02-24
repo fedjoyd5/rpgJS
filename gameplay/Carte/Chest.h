@@ -15,9 +15,12 @@ public:
 	Chest(std::string newID, std::string newPath, float newPosX, float newPosY);
 	~Chest();
 
+	std::string getID();
 	void initialize();
 	unsigned int getWidth();
 	unsigned int getHeight();
+
+	bool canInteract(sf::Vector2f playerPos);
 
 	std::string getTexturePath();
 	sf::IntRect getTextureIntRect(std::string theIntRectID);

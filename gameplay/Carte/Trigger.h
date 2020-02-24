@@ -15,8 +15,9 @@ public:
 	Trigger(std::string newID, float newPosX, float newPosY, unsigned int newWidth, unsigned int newHeight, std::string newSimpleTpMap, std::string newSimpleTpArrID);
 	~Trigger();
 
+	std::string getID();
 	void initialize();
-	bool CheckIsIn(unsigned int testPosX, unsigned int testPosY);
+	bool CheckIsIn(sf::Vector2f posToCheck);
 	
 	bool isSimpleTP();
 	std::string getSimpleTPMap();
@@ -33,7 +34,7 @@ public:
 private:
 	std::string ID;
 	std::string Path;
-	sf::IntRect Activateur;
+	sf::FloatRect Activateur;
 
 	std::string textureID;
 	unsigned int width;

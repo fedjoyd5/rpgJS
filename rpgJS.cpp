@@ -21,6 +21,7 @@ unsigned int width = 1500;
 unsigned int height = 800;
 bool fullscreen = false;
 bool azertyuiop = true;
+bool AffFPS = false;
 string DirPath("");
 
 enum Phase {
@@ -56,8 +57,8 @@ int main(int argc, char *argv[])
 			StoryID = string(argv[indeArg]);
 		}
 		if (curArg == "-fullscreen") { fullscreen = true; }
-		if (curArg == "-zqsd") { azertyuiop = true; }
 		if (curArg == "-wasd") { azertyuiop = false; }
+		if (curArg == "-fps") { AffFPS = true; }
 	}
 
 	// ------------------ chargement de l'histoire --------------------------------
@@ -108,9 +109,15 @@ int main(int argc, char *argv[])
 	// ----------------------------------------------------------------
 
 	vector<sf::Texture*> staticTextureList;
+
 	staticTextureList.push_back(new sf::Texture());
-	staticTextureList[0]->loadFromFile(TheStoryData.getPlayer()->getTexturePath());
-	TheStoryData.getPlayer()->setTexture(*staticTextureList[0]);
+	staticTextureList[0]->loadFromFile(DirPath + "base/btnE.png");
+	sf::Sprite theBtnE(*staticTextureList[0], INVISIBLE_INTRECT);
+	theBtnE.setOrigin(BTNE_O_WIDTH, BTNE_O_HEIGHT);
+
+	staticTextureList.push_back(new sf::Texture());
+	staticTextureList[1]->loadFromFile(TheStoryData.getPlayer()->getTexturePath());
+	TheStoryData.getPlayer()->setTexture(*staticTextureList[1]);
 
 	vector<sf::Texture*> DynamicTextureList;
 
@@ -128,17 +135,21 @@ int main(int argc, char *argv[])
 	vector<string> theChestLST, theMonsterLST, thePNJLST, thePropsLST, theTriggerLST;
 	Carte* TheSTMap = nullptr;
 
-	/*sf::Clock Fpscounter = sf::Clock();
-	int theCounter = 0;*/
+	sf::Clock Fpscounter = sf::Clock();
+	int theCounter = 0;
+
+	Chest* chestToActivate = nullptr;
+	PNJ* PNJToActivate = nullptr;
+	Props* propsToActivate = nullptr;
 
 	while (window.isOpen())
 	{
-		/*theCounter = theCounter + 1;
+		theCounter = theCounter + 1;
 		if (Fpscounter.getElapsedTime() >= sf::seconds(1.0)) {
-			printf("- %i image/s\n", theCounter);
+			if (AffFPS) { printf("- %i image/s\n", theCounter); }
 			Fpscounter.restart();
 			theCounter = 0;
-		}*/
+		}
 
 		// ------------------ check des evenements --------------------------------
 
@@ -230,6 +241,10 @@ int main(int argc, char *argv[])
 							Timer.restart();
 						}
 					}
+					if (sf::Keyboard::isKeyPressed(sf::Keyboard::M) && ActualPhase == Phase::InGame) { printf("Actual Pos X : %0.2f, Y : %0.2f\n", TheStoryData.getPlayer()->getPosition().x, TheStoryData.getPlayer()->getPosition().y); }
+					if (sf::Keyboard::isKeyPressed(sf::Keyboard::E) && ActualPhase == Phase::InGame && PNJToActivate != nullptr && propsToActivate == nullptr && chestToActivate == nullptr) { printf("you have activated PNJ : %s\n", PNJToActivate->getID().c_str()); }
+					if (sf::Keyboard::isKeyPressed(sf::Keyboard::E) && ActualPhase == Phase::InGame && propsToActivate != nullptr && chestToActivate == nullptr) { printf("you have activated Props : %s\n", propsToActivate->getID().c_str()); }
+					if (sf::Keyboard::isKeyPressed(sf::Keyboard::E) && ActualPhase == Phase::InGame && chestToActivate != nullptr) { printf("you have activated Chest : %s\n", chestToActivate->getID().c_str()); }
 					break;
 				default:
 					break;
@@ -253,6 +268,117 @@ int main(int argc, char *argv[])
 		if (ActualPhase == Phase::InCinematique) {}
 
 		// ------------------ traitement des info --------------------------------------------------
+
+		for (unsigned int it = 0; it < theTriggerLST.size(); it++) {
+			Trigger* theTrigger = TheSTMap->getTrigger(theTriggerLST[it]);
+			if (theTrigger->CheckIsIn(TheStoryData.getPlayer()->getPosition())) {
+				if (theTrigger->isSimpleTP()) {
+					Carte* newTheSTMap = TheStoryData.getCarte(theTrigger->getSimpleTPMap());
+					if (TheSTMap == newTheSTMap) {
+						TheStoryData.getPlayer()->setPosition(TheSTMap->getTpArrivalPosX(theTrigger->getSimpleTPArrID()), TheSTMap->getTpArrivalPosY(theTrigger->getSimpleTPArrID()));
+					} else { if (newTheSTMap != nullptr) {
+						ActualPhase = Phase::InCinematique;
+						TheSTMap = newTheSTMap;
+
+						bgTexture.loadFromFile(TheSTMap->getBackgroundPath());
+						delete BackgroundShape;
+						BackgroundShape = new sf::RectangleShape(sf::Vector2f(bgTexture.getSize()));
+						BackgroundShape->setTexture(&bgTexture);
+
+						fgTexture.loadFromFile(TheSTMap->getForegroundPath());
+						delete ForegroundShape;
+						ForegroundShape = new sf::RectangleShape(sf::Vector2f(fgTexture.getSize()));
+						ForegroundShape->setTexture(&fgTexture);
+
+						WAG.loadFromFile(TheSTMap->getWalkAbleGridPath());
+						TheStoryData.getPlayer()->setPosition(TheSTMap->getTpArrivalPosX(theTrigger->getSimpleTPArrID()), TheSTMap->getTpArrivalPosY(theTrigger->getSimpleTPArrID()));
+
+						for (unsigned int dTextureIndex = 0; dTextureIndex < DynamicTextureList.size(); dTextureIndex++) { delete DynamicTextureList[dTextureIndex]; }
+						DynamicTextureList.clear();
+
+						theChestLST = TheSTMap->getChestIdList();
+						for (unsigned int theIndex = 0; theIndex < theChestLST.size(); theIndex++) {
+							Chest* curChest = TheSTMap->getChest(theChestLST[theIndex]);
+							unsigned int tempChestInd = DynamicTextureList.size();
+							DynamicTextureList.push_back(new sf::Texture());
+							DynamicTextureList[tempChestInd]->loadFromFile(curChest->getTexturePath());
+							curChest->setTexture(*DynamicTextureList[tempChestInd]);
+						}
+
+						theMonsterLST = TheSTMap->getMonsterIdList();
+						for (unsigned int theIndex = 0; theIndex < theMonsterLST.size(); theIndex++) {
+							Monster* curMonster = TheSTMap->getMonster(theMonsterLST[theIndex]);
+							unsigned int tempMonsterInd = DynamicTextureList.size();
+							DynamicTextureList.push_back(new sf::Texture());
+							DynamicTextureList[tempMonsterInd]->loadFromFile(curMonster->getTexturePath());
+							curMonster->setTexture(*DynamicTextureList[tempMonsterInd]);
+						}
+
+						thePNJLST = TheSTMap->getPNJIdList();
+						for (unsigned int theIndex = 0; theIndex < thePNJLST.size(); theIndex++) {
+							PNJ* curPNJ = TheSTMap->getPNJ(thePNJLST[theIndex]);
+							unsigned int tempPNJInd = DynamicTextureList.size();
+							DynamicTextureList.push_back(new sf::Texture());
+							DynamicTextureList[tempPNJInd]->loadFromFile(curPNJ->getTexturePath());
+							curPNJ->setTexture(*DynamicTextureList[tempPNJInd]);
+						}
+
+						thePropsLST = TheSTMap->getPropsIdList();
+						for (unsigned int theIndex = 0; theIndex < thePropsLST.size(); theIndex++) {
+							Props* curProps = TheSTMap->getProps(thePropsLST[theIndex]);
+							unsigned int tempPropsInd = DynamicTextureList.size();
+							DynamicTextureList.push_back(new sf::Texture());
+							DynamicTextureList[tempPropsInd]->loadFromFile(curProps->getTexturePath());
+							curProps->setTexture(*DynamicTextureList[tempPropsInd]);
+						}
+
+						theTriggerLST = TheSTMap->getTriggerIdList();
+						for (unsigned int theIndex = 0; theIndex < theTriggerLST.size(); theIndex++) {
+							Trigger* curTrigger = TheSTMap->getTrigger(theTriggerLST[theIndex]);
+							if (!curTrigger->isSimpleTP()) {
+								unsigned int tempTriggerInd = DynamicTextureList.size();
+								DynamicTextureList.push_back(new sf::Texture());
+								DynamicTextureList[tempTriggerInd]->loadFromFile(curTrigger->getTexturePath());
+								curTrigger->setTexture(*DynamicTextureList[tempTriggerInd]);
+							}
+						}
+
+						ActualPhase = Phase::InGame;
+						Timer.restart();
+					}}
+				} else {
+					printf("you have activated Trigger : %s\n", theTrigger->getID().c_str());
+				}
+			}
+		}
+
+		theBtnE.setTextureRect(INVISIBLE_INTRECT);
+		chestToActivate = nullptr, propsToActivate = nullptr, PNJToActivate = nullptr;
+		for (unsigned int it = 0; it < theChestLST.size(); it++) {
+			Chest* theChest = TheSTMap->getChest(theChestLST[it]);
+			if (theChest->canInteract(TheStoryData.getPlayer()->getPosition())) {
+				chestToActivate = theChest;
+				theBtnE.setTextureRect(AFFICHE_INTRECT);
+			}
+		}
+		for (unsigned int it = 0; it < thePropsLST.size(); it++) {
+			Props* theProps = TheSTMap->getProps(thePropsLST[it]);
+			if (theProps->canInteract(TheStoryData.getPlayer()->getPosition())) {
+				propsToActivate = theProps;
+				theBtnE.setTextureRect(AFFICHE_INTRECT);
+			}
+		}
+		for (unsigned int it = 0; it < thePNJLST.size(); it++) {
+			PNJ* thePNJ = TheSTMap->getPNJ(thePNJLST[it]);
+			if (thePNJ->canInteract(TheStoryData.getPlayer()->getPosition())) {
+				PNJToActivate = thePNJ;
+				theBtnE.setTextureRect(AFFICHE_INTRECT);
+			}
+		}
+		
+		if (PNJToActivate != nullptr && propsToActivate == nullptr && chestToActivate == nullptr) { setPositionAuDessus(&theBtnE, PNJToActivate, PNJToActivate->getHeight()); }
+		if (propsToActivate != nullptr && chestToActivate == nullptr) { setPositionAuDessus(&theBtnE, propsToActivate, propsToActivate->getHeight()); }
+		if (chestToActivate != nullptr) { setPositionAuDessus(&theBtnE, chestToActivate, chestToActivate->getHeight()); }
 
 		// ------------------ dessin du rendu sur la fenetre ---------------------------------------
 
@@ -289,7 +415,8 @@ int main(int argc, char *argv[])
 				if (floatRectVeiw.contains(theTrigger->getPosition())) { window.draw(*theTrigger); }
 			}
 			window.draw(*TheStoryData.getPlayer());
-			//window.draw(*ForegroundShape);
+			window.draw(*ForegroundShape);
+			if (ActualPhase == Phase::InGame) { window.draw(theBtnE); }
 			break;
 		default:
 			break;

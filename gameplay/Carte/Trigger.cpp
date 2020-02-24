@@ -7,7 +7,7 @@ Trigger::Trigger()
 	ID = "";
 	Path = "";
 
-	Activateur = sf::IntRect(0, 0, 0, 0);
+	Activateur = sf::FloatRect(0, 0, 0, 0);
 	textureID = "";
 	width = 0;
 	height = 0;
@@ -23,7 +23,7 @@ Trigger::Trigger(string newID, string newPath, float newPosX, float newPosY)
 	Path = newPath;
 	setPosition(newPosX, newPosY);
 
-	Activateur = sf::IntRect(newPosX, newPosY, 0, 0);
+	Activateur = sf::FloatRect(newPosX, newPosY, 0, 0);
 	textureID = "";
 	width = 0;
 	height = 0;
@@ -41,7 +41,7 @@ Trigger::Trigger(string newID, float newPosX, float newPosY, unsigned int newWid
 	width = newWidth;
 	height = newHeight;
 
-	Activateur = sf::IntRect(newPosX, newPosY, newWidth, newHeight);
+	Activateur = sf::FloatRect(newPosX, newPosY, newWidth, newHeight);
 	textureID = "";
 
 	simpleTp = true;
@@ -52,6 +52,11 @@ Trigger::Trigger(string newID, float newPosX, float newPosY, unsigned int newWid
 
 Trigger::~Trigger()
 {
+}
+
+std::string Trigger::getID()
+{
+	return ID;
 }
 
 void Trigger::initialize()
@@ -74,14 +79,14 @@ void Trigger::initialize()
 		}
 
 		setTextureRect(getDefaultTextureIntRect());
-		setOrigin(doAPourcent(50, width), doAPourcent(50, height));
+		setOrigin(0, 0);
 	}
 	if (theJSContext != nullptr) { delete theJSContext; }
 }
 
-bool Trigger::CheckIsIn(unsigned int testPosX, unsigned int testPosY)
+bool Trigger::CheckIsIn(sf::Vector2f posToCheck)
 {
-	return Activateur.contains(testPosX, testPosY);
+	return Activateur.contains(posToCheck);
 }
 
 bool Trigger::isSimpleTP()
@@ -157,6 +162,7 @@ void Trigger::setSize(unsigned int newWidth, unsigned int newHeight)
 {
 	width = newWidth;
 	height = newHeight;
+	Activateur = sf::FloatRect(getPosition().x, getPosition().y, newWidth, newHeight);
 }
 
 bool Trigger::addPosTexture(std::string newID, unsigned int newPosX, unsigned int newPosY)

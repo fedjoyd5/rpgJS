@@ -47,3 +47,8 @@ sf::IntRect getTextureIntRect(Chest* TheChest, std::string AnimationID, sf::Time
 {
 	return sf::IntRect();
 }
+
+void setPositionAuDessus(sf::Sprite * InfoBtn, sf::Sprite * theObj, float height)
+{
+	InfoBtn->setPosition(theObj->getPosition().x, (theObj->getPosition().y - (height + NBPX_ADD)));
+}
